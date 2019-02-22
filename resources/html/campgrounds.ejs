@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Campgrounds - YelpCamp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1>Campgrounds Page</h1>
+    <% campgrounds.forEach(campground => { %>
+        <div>
+            <h4><%= campground.name %></h4>
+            <img src="<%= campground.image %>">
+        </div>
+    <% }) %>
+</body>
+</html>

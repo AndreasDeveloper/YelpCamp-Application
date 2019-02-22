@@ -1,0 +1,32 @@
+{
+  "name": "yelp-camp-app",
+  "version": "1.0.0",
+  "description": "YelpCamp is a web application that provides informations related to most popular camping grounds.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AndreasDeveloper/YelpCamp-Application.git"
+  },
+  "keywords": [
+    "webapp",
+    "website",
+    "yelp",
+    "yelpcamp",
+    "js",
+    "express",
+    "nodejs"
+  ],
+  "author": "AndreasDEV",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AndreasDeveloper/YelpCamp-Application/issues"
+  },
+  "homepage": "https://github.com/AndreasDeveloper/YelpCamp-Application#readme",
+  "dependencies": {
+    "ejs": "^2.6.1",
+    "express": "^4.16.4"
+  }
+}

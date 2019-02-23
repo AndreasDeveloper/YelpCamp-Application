@@ -4,7 +4,7 @@
   "description": "YelpCamp is a web application that provides informations related to most popular camping grounds.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "node-start": "nodemon ./resources/server/server-index.js"
   },
   "repository": {
     "type": "git",
@@ -26,6 +26,7 @@
   },
   "homepage": "https://github.com/AndreasDeveloper/YelpCamp-Application#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
     "express": "^4.16.4"
   }

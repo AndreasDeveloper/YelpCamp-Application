@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <title>Campgrounds - YelpCamp</title>
+</head>
+<body>
+
+    <!-- NAVIGATION | START -->
+    <nav class="navbar navbar-expand navbar-dark bg-dark" style="margin-bottom: 2rem;">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">YelpCamp</a>
+            </div>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item active"><a href="/" class="nav-link">Login</a></li>
+                    <li class="nav-item active"><a href="/" class="nav-link">Sign Up</a></li>
+                    <li class="nav-item active"><a href="/" class="nav-link">Logout</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- NAVIGATION | END -->
+
+    <div class="container">
+        <!-- HEADER | START -->
+        <header class="jumbotron">
+            <div class="container">
+                <h1>Welcome to YelpCamp Campgrounds</h1>
+                <p>Check our most popular campgrounds</p>
+                <p>
+                    <a href="/campgrounds/new" class="btn btn-primary btn-lg">Add a New Campground</a>
+                </p>
+            </div>
+        </header>
+        <!-- HEADER | END -->
+
+        <!-- CAMPGROUNDS | START -->
+        <div class="row text-center">
+            <% campgrounds.forEach(campground => { %>
+                <div class="col-md-3 col-sm-6">
+                    <div class="img-thumbnail">
+                        <img src="<%= campground.image %>" width="100%" heigth="100%">
+                        <div class="caption"><h4><%= campground.name %></h4></div>
+                        <p><a href="/campgrounds/<%=campground._id%>" class="btn btn-primary">More Info</a></p>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+        <!-- CAMPGROUNDS | END -->
+    </div>
+</body>
+</html>

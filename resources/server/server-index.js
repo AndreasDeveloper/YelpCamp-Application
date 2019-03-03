@@ -1,8 +1,11 @@
-// - Imports - \\
+// - Importing Mandatory Files - \\
 const express = require('express'),
       app = express(),
       bodyParser = require('body-parser'),
       mongoose = require('mongoose');
+// - Importing Other Project Files | MVC - \\
+const Campground = require('./models/Campgrounds');
+const seedDB = require('./seeds'); // Temp - For Testing
 
 // - Body Parser - \\
 app.use(bodyParser.urlencoded({extended: true }));
@@ -11,30 +14,8 @@ app.set('view engine', 'ejs');
 // - MongoDB Database - \\
 mongoose.connect('mongodb://localhost/yelp_camp');
 mongoose.set('useNewUrlParser', true);
-
-// - DB Schema - \\
-const campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String
-});
-// - Compiling mongoose Schema to a model - \\
-const Campground = mongoose.model('Campground', campgroundSchema);
-
-/*
-// TEMP
-Campground.create({
-    name: 'Salmon Creek',
-    image: 'https://images.pexels.com/photos/1687845/pexels-photo-1687845.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
-    description: 'Huge Creek for you to explore. Enjoyable view!'
-}, (err, campground) => {
-    if (!err) {
-        console.log('Created new Campground!');
-        console.log(campground);
-    } else {
-        throw new Error(err);
-    }
-}); */
+// - Deleting Data - TESTING - \\
+seedDB();
 
 // GET PAGE #1 | - Landing Page - \\
 app.get('/', (req, res) => {
@@ -60,7 +41,7 @@ app.get('/campgrounds/new', (req, res) => {
 
 // POST Request for PAGE #3 | - Adding Camp Grounds using Form - \\
 app.post('/campgrounds', (req, res) => {
-    const name = req.body.name, // accessing name and image from form name attributes
+    const name = req.body.name, // accessing name, image, desc from form name attributes
           image = req.body.image,
           description = req.body.description,
           newCampground = {name: name, image: image, description: description}; // storing extracted form data into the object
@@ -79,7 +60,7 @@ app.post('/campgrounds', (req, res) => {
 app.get('/campgrounds/:id', (req, res) => {
     const campID = req.params.id;
     // Display specific campground with given ID
-    Campground.findById(campID, (err, foundCampground) => {
+    Campground.findById(campID).populate('comments').exec((err, foundCampground) => { // Populating campgrounds object with comments
         if (!err) {
             // Render show campground page for specific ID
             res.render(`${__dirname}/../html/show.ejs`, {campground: foundCampground});

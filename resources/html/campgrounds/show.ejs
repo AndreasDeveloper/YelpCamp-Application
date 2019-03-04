@@ -11,12 +11,15 @@
     <!-- NAVIGATION | IMPLEMENTATION -->
     <% include ../partials/navigation.ejs %>
 
+    <!-- CAMPGROUND CONTENT -->
     <h1><%= campground.name %></h1>
     <img src="<%= campground.image %>" width="100%" heigth="100%">
     <p><%= campground.description %></p>
+    <a class="btn btn-success" href="/campgrounds/<%= campground._id %>/comments/new">Add New Comment</a>
 
+    <!-- COMMENTS -->
     <% campground.comments.forEach(comment => { %>
-    <h3><%= comment.text %> &dash; <%= comment.author %></h3>
+    <p><strong><%= comment.author %></strong> &dash; <%= comment.text %></p>
 <% }); %>
 
 </body>

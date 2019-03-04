@@ -4,8 +4,9 @@ const express = require('express'),
       bodyParser = require('body-parser'),
       mongoose = require('mongoose');
 // - Importing Other Project Files | MVC - \\
-const Campground = require('./models/Campgrounds');
-const seedDB = require('./seeds'); // Temp - For Testing
+const Campground = require('./models/Campgrounds'),
+      Comment = require('./models/Comments'),
+      seedDB = require('./seeds'); // Temp - For Testing
 
 // - Body Parser - \\
 app.use(bodyParser.urlencoded({extended: true }));
@@ -22,7 +23,11 @@ app.get('/', (req, res) => {
     res.render(`${__dirname}/../html/landing.ejs`);
 });
 
-// GET PAGE #2 | - Camp Grounds - \\
+// ==================== \\
+// - CAMPGROUNDS ROUTE - 
+// ==================== \\
+
+// GET - ALL CAMPGROUNDS - INDEX | - Camp Grounds - \\
 app.get('/campgrounds', (req, res) => {
     // Get campgrounds from DB
     Campground.find({}, (err, allCampgrounds) => {
@@ -34,12 +39,12 @@ app.get('/campgrounds', (req, res) => {
     });
 });
 
-// GET PAGE #3 | - Adding new Camp grounds page with form - \\
+// GET - NEW CAMPGROUND FORM | - Adding new Camp grounds page with form - \\
 app.get('/campgrounds/new', (req, res) => {
     res.render(`${__dirname}/../html/campgrounds/new.ejs`);
 });
 
-// POST Request for PAGE #3 | - Adding Camp Grounds using Form - \\
+// POST - CREATE NEW CAMPGROUND | - Adding Camp Grounds using Form - \\
 app.post('/campgrounds', (req, res) => {
     const name = req.body.name, // accessing name, image, desc from form name attributes
           image = req.body.image,
@@ -56,7 +61,7 @@ app.post('/campgrounds', (req, res) => {
     })
 });
 
-// GET PAGE #4 | - Shows more info to specific campground - \\
+// GET - SHOW SPECIFIC CAMPGROUND | - Shows more info to specific campground - \\
 app.get('/campgrounds/:id', (req, res) => {
     const campID = req.params.id;
     // Display specific campground with given ID
@@ -75,10 +80,10 @@ app.get('/campgrounds/:id', (req, res) => {
 // - COMMENTS ROUTE - 
 // ==================== \\
 
-//
+// GET - NEW COMMENT FORM | - Add new comment form
 app.get('/campgrounds/:id/comments/new', (req, res) => {
-    const campID = req.params.id;
-    Campground.findById(campID, (err, campground) => {
+    const campID = req.params.id; // Get campground ID
+    Campground.findById(campID, (err, campground) => { // Find campground by ID
         if (!err) {
             res.render(`${__dirname}/../html/comments/new-comment.ejs`, { campground: campground });
         } else {
@@ -87,6 +92,26 @@ app.get('/campgrounds/:id/comments/new', (req, res) => {
     });
 });
 
+// POST - NEW COMMENT | - Create new comment for specific campground
+app.post('/campgrounds/:id/comments', (req, res) => {
+    const campID = req.params.id;
+    const commentsBody = req.body.comment;
+    Campground.findById(campID, (err, campground) => {
+        if (!err) {
+            Comment.create(commentsBody, (err, comment) => {
+                if (!err) {
+                    campground.comments.push(comment);
+                    campground.save();
+                    res.redirect(`/campgrounds/${campground._id}`)
+                } else {
+                    throw new Error(err);
+                }
+            });
+        } else {
+            throw new Error(err);
+        }
+    });
+});
 
 // - Setting the Port | Listen - \\
 const port = 3000;

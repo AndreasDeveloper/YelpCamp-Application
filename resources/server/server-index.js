@@ -15,8 +15,10 @@ app.set('view engine', 'ejs');
 // - MongoDB Database - \\
 mongoose.connect('mongodb://localhost/yelp_camp');
 mongoose.set('useNewUrlParser', true);
-// - Deleting Data - TESTING - \\
+// - Seeding - TESTING - \\
 seedDB();
+// - Importing Static Files - \\
+app.use(express.static(`${__dirname}/../`));
 
 // GET PAGE #1 | - Landing Page - \\
 app.get('/', (req, res) => {

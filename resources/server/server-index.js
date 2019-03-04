@@ -27,7 +27,7 @@ app.get('/campgrounds', (req, res) => {
     // Get campgrounds from DB
     Campground.find({}, (err, allCampgrounds) => {
         if (!err) {
-            res.render(`${__dirname}/../html/index.ejs`, {campgrounds: allCampgrounds}); // campgrounds param in ejs : allCampgrounds as DB data
+            res.render(`${__dirname}/../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds}); // campgrounds param in ejs : allCampgrounds as DB data
         } else {
             throw new Error(err);
         }
@@ -36,7 +36,7 @@ app.get('/campgrounds', (req, res) => {
 
 // GET PAGE #3 | - Adding new Camp grounds page with form - \\
 app.get('/campgrounds/new', (req, res) => {
-    res.render(`${__dirname}/../html/new.ejs`);
+    res.render(`${__dirname}/../html/campgrounds/new.ejs`);
 });
 
 // POST Request for PAGE #3 | - Adding Camp Grounds using Form - \\
@@ -63,7 +63,24 @@ app.get('/campgrounds/:id', (req, res) => {
     Campground.findById(campID).populate('comments').exec((err, foundCampground) => { // Populating campgrounds object with comments
         if (!err) {
             // Render show campground page for specific ID
-            res.render(`${__dirname}/../html/show.ejs`, {campground: foundCampground});
+            res.render(`${__dirname}/../html/campgrounds/show.ejs`, {campground: foundCampground});
+        } else {
+            throw new Error(err);
+        }
+    });
+});
+
+
+// ==================== \\
+// - COMMENTS ROUTE - 
+// ==================== \\
+
+//
+app.get('/campgrounds/:id/comments/new', (req, res) => {
+    const campID = req.params.id;
+    Campground.findById(campID, (err, campground) => {
+        if (!err) {
+            res.render(`${__dirname}/../html/comments/new-comment.ejs`, { campground: campground });
         } else {
             throw new Error(err);
         }

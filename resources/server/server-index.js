@@ -10,6 +10,8 @@ const Campground = require('./models/Campgrounds'),
       Comment = require('./models/Comments'),
       User = require('./models/User');
       seedDB = require('./seeds'); // Temp - For Testing
+// - Importing Middlewares - \\
+const isLoggedIn = require('./middlewares/isLoggedIn');
 
 
 // ==================== \\
@@ -104,7 +106,7 @@ app.get('/campgrounds/:id', (req, res) => {
 // ==================== \\
 
 // GET - NEW COMMENT FORM | - Add new comment form
-app.get('/campgrounds/:id/comments/new', (req, res) => {
+app.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
     const campID = req.params.id; // Get campground ID
     Campground.findById(campID, (err, campground) => { // Find campground by ID
         if (!err) {
@@ -116,7 +118,7 @@ app.get('/campgrounds/:id/comments/new', (req, res) => {
 });
 
 // POST - NEW COMMENT | - Create new comment for specific campground
-app.post('/campgrounds/:id/comments', (req, res) => {
+app.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
     const campID = req.params.id;
     const commentsBody = req.body.comment;
     Campground.findById(campID, (err, campground) => {
@@ -173,6 +175,14 @@ app.post('/login', passport.authenticate('local', {
     successRedirect: '/campgrounds', 
     failureRedirect: '/login' }), 
     (req, res) => {
+});
+
+// --- LOGOUT SETUP --- \\
+
+// GET - LOGOUT | - Logout Get Request
+app.get('/logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
 });
 
 

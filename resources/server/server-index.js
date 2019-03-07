@@ -161,6 +161,20 @@ app.post('/register', (req, res) => {
     });
 });
 
+// --- LOGIN SETUP --- \\
+
+// GET - LOGIN PAGE | - Page to login
+app.get('/login', (req, res) => {
+    res.render(`${__dirname}/../html/authentication/login.ejs`);
+});
+
+// POST - LOGIN USER | - Login's user
+app.post('/login', passport.authenticate('local', { 
+    successRedirect: '/campgrounds', 
+    failureRedirect: '/login' }), 
+    (req, res) => {
+});
+
 
 // ==================== \\
 //  - LISTENING PORT - 

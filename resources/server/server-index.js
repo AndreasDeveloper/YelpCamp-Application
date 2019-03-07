@@ -2,12 +2,19 @@
 const express = require('express'),
       app = express(),
       bodyParser = require('body-parser'),
-      mongoose = require('mongoose');
+      mongoose = require('mongoose'),
+      passport = require('passport'),
+      LocalStrategy = require('passport-local');
 // - Importing Other Project Files | MVC - \\
 const Campground = require('./models/Campgrounds'),
       Comment = require('./models/Comments'),
+      User = require('./models/User');
       seedDB = require('./seeds'); // Temp - For Testing
 
+
+// ==================== \\
+// - DEPENDENCIES SETUP - 
+// ==================== \\
 // - Body Parser - \\
 app.use(bodyParser.urlencoded({extended: true }));
 // - View Engine - \\
@@ -24,11 +31,25 @@ app.use(express.static(`${__dirname}/../`));
 app.get('/', (req, res) => {
     res.render(`${__dirname}/../html/landing.ejs`);
 });
+// ==================== \\
+//  - PASSPORT SETUP - 
+// ==================== \\
+// - Express Session - \\
+app.use(require('express-session')({
+    secret: 'Accessing secret data',
+    resave: false,
+    saveUninitialized: false
+}));
+// - Passport Methods - \\
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // ==================== \\
 // - CAMPGROUNDS ROUTE - 
 // ==================== \\
-
 // GET - ALL CAMPGROUNDS - INDEX | - Camp Grounds - \\
 app.get('/campgrounds', (req, res) => {
     // Get campgrounds from DB
@@ -79,7 +100,7 @@ app.get('/campgrounds/:id', (req, res) => {
 
 
 // ==================== \\
-// - COMMENTS ROUTE - 
+//  - COMMENTS ROUTE - 
 // ==================== \\
 
 // GET - NEW COMMENT FORM | - Add new comment form
@@ -115,6 +136,35 @@ app.post('/campgrounds/:id/comments', (req, res) => {
     });
 });
 
+
+// ======================== \\
+// - AUTHENTICATION ROUTES - 
+// ======================== \\
+
+// GET - REGISTER PAGE | - Page to sign up
+app.get('/register', (req, res) => {
+    res.render(`${__dirname}/../html/authentication/register.ejs`);
+});
+
+// POST - REGISTER USER | - Create new user
+app.post('/register', (req, res) => {
+    const username = req.body.username,
+          password = req.body.password;
+    User.register(new User({ username: username}), password, (err, user) => { // user => newly created user
+        if (!err) {
+            passport.authenticate('local')(req, res, () => {
+                res.redirect('/campgrounds');
+            });      
+        } else {
+            throw new Error(err);
+        }
+    });
+});
+
+
+// ==================== \\
+//  - LISTENING PORT - 
+// ==================== \\
 // - Setting the Port | Listen - \\
 const port = 3000;
 app.listen(port, () => console.log(`Server is running on port - ${port}`));

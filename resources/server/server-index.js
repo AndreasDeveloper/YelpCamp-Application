@@ -13,7 +13,6 @@ const Campground = require('./models/Campgrounds'),
 // - Importing Middlewares - \\
 const isLoggedIn = require('./middlewares/isLoggedIn');
 
-
 // ==================== \\
 // - DEPENDENCIES SETUP - 
 // ==================== \\
@@ -29,10 +28,6 @@ seedDB();
 // - Importing Static Files - \\
 app.use(express.static(`${__dirname}/../`));
 
-// GET PAGE #1 | - Landing Page - \\
-app.get('/', (req, res) => {
-    res.render(`${__dirname}/../html/landing.ejs`);
-});
 // ==================== \\
 //  - PASSPORT SETUP - 
 // ==================== \\
@@ -49,15 +44,32 @@ passport.use(new LocalStrategy(User.authenticate()));
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
+// Displays user on every single page (if logged in)
+app.use((req, res, next) => {
+    res.locals.currentUser = req.user;
+    next();
+});
+
+// ==================== \\
+//    - INDEX ROUTE - 
+// ==================== \\
+
+// GET PAGE #1 | - Landing Page - \\
+app.get('/', (req, res) => {
+    res.render(`${__dirname}/../html/landing.ejs`);
+});
+
 // ==================== \\
 // - CAMPGROUNDS ROUTE - 
 // ==================== \\
+
 // GET - ALL CAMPGROUNDS - INDEX | - Camp Grounds - \\
 app.get('/campgrounds', (req, res) => {
+    const userBody = req.user;
     // Get campgrounds from DB
     Campground.find({}, (err, allCampgrounds) => {
         if (!err) {
-            res.render(`${__dirname}/../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds}); // campgrounds param in ejs : allCampgrounds as DB data
+            res.render(`${__dirname}/../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds, currentUser: userBody}); // campgrounds param in ejs : allCampgrounds as DB data
         } else {
             throw new Error(err);
         }
@@ -83,7 +95,7 @@ app.post('/campgrounds', (req, res) => {
         } else {
             throw new Error(err);
         }
-    })
+    });
 });
 
 // GET - SHOW SPECIFIC CAMPGROUND | - Shows more info to specific campground - \\
@@ -127,7 +139,7 @@ app.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
                 if (!err) {
                     campground.comments.push(comment);
                     campground.save();
-                    res.redirect(`/campgrounds/${campground._id}`)
+                    res.redirect(`/campgrounds/${campground._id}`);
                 } else {
                     throw new Error(err);
                 }

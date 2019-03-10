@@ -6,5 +6,6 @@ const isLoggedIn = (req, res, next) => {
     res.redirect('/login');
 };
 
+
 // Exporting middleware
 module.exports = isLoggedIn;

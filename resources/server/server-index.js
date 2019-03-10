@@ -8,10 +8,15 @@ const express = require('express'),
 // - Importing Other Project Files | MVC - \\
 const Campground = require('./models/Campgrounds'),
       Comment = require('./models/Comments'),
-      User = require('./models/User');
+      User = require('./models/User'),
       seedDB = require('./seeds'); // Temp - For Testing
 // - Importing Middlewares - \\
 const isLoggedIn = require('./middlewares/isLoggedIn');
+// - Importing Routes Files - \\
+const authenticationRoutes = require('./routes/authentication'),
+      campgroundRoutes = require('./routes/campgrounds'),
+      commentsRoutes = require('./routes/comments'),
+      indexRoutes = require('./routes/index');
 
 // ==================== \\
 // - DEPENDENCIES SETUP - 
@@ -50,153 +55,19 @@ app.use((req, res, next) => {
     next();
 });
 
-// ==================== \\
-//    - INDEX ROUTE - 
-// ==================== \\
+// - Using Routes Files - \\
+app.use(authenticationRoutes);
+app.use(campgroundRoutes);
+app.use(commentsRoutes);
+app.use(indexRoutes);
 
-// GET PAGE #1 | - Landing Page - \\
-app.get('/', (req, res) => {
-    res.render(`${__dirname}/../html/landing.ejs`);
-});
+/*  
+    app.use('/campgrounds', campgroundRoutes);
+    app.use('/campgrounds/:id/comments', commentsRoutes);
+    app.use('/', indexRoutes);
 
-// ==================== \\
-// - CAMPGROUNDS ROUTE - 
-// ==================== \\
-
-// GET - ALL CAMPGROUNDS - INDEX | - Camp Grounds - \\
-app.get('/campgrounds', (req, res) => {
-    const userBody = req.user;
-    // Get campgrounds from DB
-    Campground.find({}, (err, allCampgrounds) => {
-        if (!err) {
-            res.render(`${__dirname}/../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds, currentUser: userBody}); // campgrounds param in ejs : allCampgrounds as DB data
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-// GET - NEW CAMPGROUND FORM | - Adding new Camp grounds page with form - \\
-app.get('/campgrounds/new', (req, res) => {
-    res.render(`${__dirname}/../html/campgrounds/new.ejs`);
-});
-
-// POST - CREATE NEW CAMPGROUND | - Adding Camp Grounds using Form - \\
-app.post('/campgrounds', (req, res) => {
-    const name = req.body.name, // accessing name, image, desc from form name attributes
-          image = req.body.image,
-          description = req.body.description,
-          newCampground = {name: name, image: image, description: description}; // storing extracted form data into the object
-    // Create a new campground, save it to DB
-    Campground.create(newCampground, (err, newlyCreatedCamp) => { // newlyCreatedCamp is a object of newly created data
-        if (!err) {
-            // Redirecting back to campgrounds page
-            res.redirect('/campgrounds');
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-// GET - SHOW SPECIFIC CAMPGROUND | - Shows more info to specific campground - \\
-app.get('/campgrounds/:id', (req, res) => {
-    const campID = req.params.id;
-    // Display specific campground with given ID
-    Campground.findById(campID).populate('comments').exec((err, foundCampground) => { // Populating campgrounds object with comments
-        if (!err) {
-            // Render show campground page for specific ID
-            res.render(`${__dirname}/../html/campgrounds/show.ejs`, {campground: foundCampground});
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-
-// ==================== \\
-//  - COMMENTS ROUTE - 
-// ==================== \\
-
-// GET - NEW COMMENT FORM | - Add new comment form
-app.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
-    const campID = req.params.id; // Get campground ID
-    Campground.findById(campID, (err, campground) => { // Find campground by ID
-        if (!err) {
-            res.render(`${__dirname}/../html/comments/new-comment.ejs`, { campground: campground });
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-// POST - NEW COMMENT | - Create new comment for specific campground
-app.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
-    const campID = req.params.id;
-    const commentsBody = req.body.comment;
-    Campground.findById(campID, (err, campground) => {
-        if (!err) {
-            Comment.create(commentsBody, (err, comment) => {
-                if (!err) {
-                    campground.comments.push(comment);
-                    campground.save();
-                    res.redirect(`/campgrounds/${campground._id}`);
-                } else {
-                    throw new Error(err);
-                }
-            });
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-
-// ======================== \\
-// - AUTHENTICATION ROUTES - 
-// ======================== \\
-
-// GET - REGISTER PAGE | - Page to sign up
-app.get('/register', (req, res) => {
-    res.render(`${__dirname}/../html/authentication/register.ejs`);
-});
-
-// POST - REGISTER USER | - Create new user
-app.post('/register', (req, res) => {
-    const username = req.body.username,
-          password = req.body.password;
-    User.register(new User({ username: username}), password, (err, user) => { // user => newly created user
-        if (!err) {
-            passport.authenticate('local')(req, res, () => {
-                res.redirect('/campgrounds');
-            });      
-        } else {
-            throw new Error(err);
-        }
-    });
-});
-
-// --- LOGIN SETUP --- \\
-
-// GET - LOGIN PAGE | - Page to login
-app.get('/login', (req, res) => {
-    res.render(`${__dirname}/../html/authentication/login.ejs`);
-});
-
-// POST - LOGIN USER | - Login's user
-app.post('/login', passport.authenticate('local', { 
-    successRedirect: '/campgrounds', 
-    failureRedirect: '/login' }), 
-    (req, res) => {
-});
-
-// --- LOGOUT SETUP --- \\
-
-// GET - LOGOUT | - Logout Get Request
-app.get('/logout', (req, res) => {
-    req.logout();
-    res.redirect('/');
-});
-
+    -- Reduces route codes in each route files. Instead of writing app.get('/campgrounds/new') ==> app.get('/new')
+*/
 
 // ==================== \\
 //  - LISTENING PORT - 

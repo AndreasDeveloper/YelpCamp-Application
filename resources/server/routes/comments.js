@@ -24,7 +24,7 @@ router.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
     });
 });
 
-// POST - NEW COMMENT | - Create new comment for specific campground
+// POST - CREATE NEW COMMENT | - Create new comment for specific campground
 router.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
     const campID = req.params.id;
     const commentsBody = req.body.comment;
@@ -32,6 +32,11 @@ router.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
         if (!err) {
             Comment.create(commentsBody, (err, comment) => {
                 if (!err) {
+                    // Add username and ID to comment
+                    comment.author._id = req.user._id;
+                    comment.author.username = req.user.username;
+                    // Save comment
+                    comment.save();
                     campground.comments.push(comment);
                     campground.save();
                     res.redirect(`/campgrounds/${campground._id}`);

@@ -28,8 +28,8 @@ app.set('view engine', 'ejs');
 // - MongoDB Database - \\
 mongoose.connect('mongodb://localhost/yelp_camp');
 mongoose.set('useNewUrlParser', true);
-// - Seeding - TESTING - \\
-seedDB();
+// - Seeding Database - TESTING - \\
+//seedDB();
 // - Importing Static Files - \\
 app.use(express.static(`${__dirname}/../`));
 

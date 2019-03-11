@@ -1,6 +1,8 @@
 // Importing Express Router
 const express = require('express'),
       router = express.Router();
+// Importing middlewares
+const isLoggedIn = require('../middlewares/isLoggedIn');
 // Importing other files 
 const Campground = require('../models/Campgrounds');
 
@@ -22,16 +24,19 @@ router.get('/campgrounds', (req, res) => {
 });
 
 // GET - NEW CAMPGROUND FORM | - Adding new Camp grounds page with form - \\
-router.get('/campgrounds/new', (req, res) => {
+router.get('/campgrounds/new', isLoggedIn, (req, res) => {
     res.render(`${__dirname}/../../html/campgrounds/new.ejs`);
 });
 
 // POST - CREATE NEW CAMPGROUND | - Adding Camp Grounds using Form - \\
-router.post('/campgrounds', (req, res) => {
-    const name = req.body.name, // accessing name, image, desc from form name attributes
+router.post('/campgrounds', isLoggedIn, (req, res) => {
+    // Author object filled with users ID and username (In order to display username that created campground)
+    const author = { id: req.user._id, username: req.user.username };
+    // accessing name, image, desc from form name attributes (Campground data)
+    const name = req.body.name, 
           image = req.body.image,
           description = req.body.description,
-          newCampground = {name: name, image: image, description: description}; // storing extracted form data into the object
+          newCampground = {name: name, image: image, description: description, author: author}; // storing extracted form data into the object
     // Create a new campground, save it to DB
     Campground.create(newCampground, (err, newlyCreatedCamp) => { // newlyCreatedCamp is a object of newly created data
         if (!err) {

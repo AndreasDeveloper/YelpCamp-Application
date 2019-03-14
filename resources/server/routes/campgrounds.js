@@ -4,7 +4,8 @@ const express = require('express'),
 // Importing middlewares
 const isLoggedIn = require('../middlewares/isLoggedIn');
 // Importing other files 
-const Campground = require('../models/Campgrounds');
+const Campground = require('../models/Campgrounds'),
+      Comment = require('../models/Comments');
 
 // ==================== \\
 // - CAMPGROUNDS ROUTE - 
@@ -92,12 +93,17 @@ router.put('/campgrounds/:id', (req, res) => {
 // DELETE - DELETE CAMPGROUND | - Deletes campground from database
 router.delete('/campgrounds/:id', (req, res) => {
     const campID = req.params.id;
-    Campground.findByIdAndRemove(campID, (err) => {
+    Campground.findByIdAndRemove(campID, (err, campgrounds) => {
         if (!err) {
             res.redirect('/campgrounds');
         } else {    
             throw new Error(err);
         }
+        Comment.deleteMany({ _id: {$in: campgrounds.comments}}, (err) => {
+            if (err) {
+                throw new Error(err);
+            } 
+        });
     });
 });
 

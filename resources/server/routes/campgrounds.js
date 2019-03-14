@@ -89,5 +89,17 @@ router.put('/campgrounds/:id', (req, res) => {
     // Redirect
 });
 
+// DELETE - DELETE CAMPGROUND | - Deletes campground from database
+router.delete('/campgrounds/:id', (req, res) => {
+    const campID = req.params.id;
+    Campground.findByIdAndRemove(campID, (err) => {
+        if (!err) {
+            res.redirect('/campgrounds');
+        } else {    
+            throw new Error(err);
+        }
+    });
+});
+
 // Exporting Campgrounds Router
 module.exports = router;

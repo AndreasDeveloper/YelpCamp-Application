@@ -9,3 +9,11 @@ body {
 .thumbnail .caption-full {
     padding: 9px;
 }
+
+/*  SHOW PAGE  */
+
+.button-actions {
+    display: flex;
+    flex-direction: row;
+}
+.button-actions a { margin-right: 10px; }

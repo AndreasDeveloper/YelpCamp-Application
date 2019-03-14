@@ -62,5 +62,32 @@ router.get('/campgrounds/:id', (req, res) => {
     });
 });
 
+// GET - EDIT CAMPGROUND | - Edit campground page
+router.get('/campgrounds/:id/edit', (req, res) => {
+    const campID = req.params.id;
+    Campground.findById(campID, (err, campground) => {
+        if (!err) {
+            res.render(`${__dirname}/../../html/campgrounds/edit.ejs`, {campground: campground});
+        } else {
+            throw new Error(err);
+        }
+    });
+});
+
+// PUT - UPDATE CAMPGROUND | - Update campground with new info
+router.put('/campgrounds/:id', (req, res) => {
+    const campID = req.params.id,
+          campContent = req.body.campground; // Includes name, image and text content of campground
+    // Find & Update campground
+    Campground.findByIdAndUpdate(campID, campContent, (err, updateCamp) => {
+        if (!err) {
+            res.redirect(`/campgrounds/${campID}`);
+        } else {
+            throw new Error(err);
+        }
+    });
+    // Redirect
+});
+
 // Exporting Campgrounds Router
 module.exports = router;

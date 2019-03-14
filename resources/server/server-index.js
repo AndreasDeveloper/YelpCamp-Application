@@ -4,7 +4,8 @@ const express = require('express'),
       bodyParser = require('body-parser'),
       mongoose = require('mongoose'),
       passport = require('passport'),
-      LocalStrategy = require('passport-local');
+      LocalStrategy = require('passport-local'),
+      methodOverride = require('method-override');
 // - Importing Other Project Files | MVC - \\
 const Campground = require('./models/Campgrounds'),
       Comment = require('./models/Comments'),
@@ -32,6 +33,8 @@ mongoose.set('useNewUrlParser', true);
 //seedDB();
 // - Importing Static Files - \\
 app.use(express.static(`${__dirname}/../`));
+// - Method Override - \\
+app.use(methodOverride('_method'));
 
 // ==================== \\
 //  - PASSPORT SETUP - 

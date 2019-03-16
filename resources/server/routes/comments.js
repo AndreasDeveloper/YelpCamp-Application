@@ -6,14 +6,14 @@ const express = require('express'),
 const Campground = require('../models/Campgrounds'),
       Comment = require('../models/Comments');
 // Importing Middleware
-const isLoggedIn = require('../middlewares/isLoggedIn');
+const authMiddleware = require('../middlewares/authMiddleware');
 
 // ==================== \\
 //  - COMMENTS ROUTE - 
 // ==================== \\
 
 // GET - NEW COMMENT FORM | - Add new comment form
-router.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
+router.get('/campgrounds/:id/comments/new', authMiddleware.isLoggedIn, (req, res) => {
     const campID = req.params.id; // Get campground ID
     Campground.findById(campID, (err, campground) => { // Find campground by ID
         if (!err) {
@@ -25,7 +25,7 @@ router.get('/campgrounds/:id/comments/new', isLoggedIn, (req, res) => {
 });
 
 // POST - CREATE NEW COMMENT | - Create new comment for specific campground
-router.post('/campgrounds/:id/comments', isLoggedIn, (req, res) => {
+router.post('/campgrounds/:id/comments', authMiddleware.isLoggedIn, (req, res) => {
     const campID = req.params.id;
     const commentsBody = req.body.comment;
     Campground.findById(campID, (err, campground) => {

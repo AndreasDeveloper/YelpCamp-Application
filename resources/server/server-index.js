@@ -12,7 +12,7 @@ const Campground = require('./models/Campgrounds'),
       User = require('./models/User'),
       seedDB = require('./seeds'); // Temp - For Testing
 // - Importing Middlewares - \\
-const isLoggedIn = require('./middlewares/isLoggedIn');
+const isLoggedIn = require('./middlewares/authMiddleware');
 // - Importing Routes Files - \\
 const authenticationRoutes = require('./routes/authentication'),
       campgroundRoutes = require('./routes/campgrounds'),

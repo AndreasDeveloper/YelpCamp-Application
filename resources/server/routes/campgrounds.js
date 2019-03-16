@@ -2,7 +2,7 @@
 const express = require('express'),
       router = express.Router();
 // Importing middlewares
-const isLoggedIn = require('../middlewares/isLoggedIn');
+const authMiddleware = require('../middlewares/authMiddleware');
 // Importing other files 
 const Campground = require('../models/Campgrounds'),
       Comment = require('../models/Comments');
@@ -25,12 +25,12 @@ router.get('/campgrounds', (req, res) => {
 });
 
 // GET - NEW CAMPGROUND FORM | - Adding new Camp grounds page with form - \\
-router.get('/campgrounds/new', isLoggedIn, (req, res) => {
+router.get('/campgrounds/new', authMiddleware.isLoggedIn, (req, res) => {
     res.render(`${__dirname}/../../html/campgrounds/new.ejs`);
 });
 
 // POST - CREATE NEW CAMPGROUND | - Adding Camp Grounds using Form - \\
-router.post('/campgrounds', isLoggedIn, (req, res) => {
+router.post('/campgrounds', authMiddleware.isLoggedIn, (req, res) => {
     // Author object filled with users ID and username (In order to display username that created campground)
     const author = { id: req.user._id, username: req.user.username };
     // accessing name, image, desc from form name attributes (Campground data)
@@ -64,19 +64,15 @@ router.get('/campgrounds/:id', (req, res) => {
 });
 
 // GET - EDIT CAMPGROUND | - Edit campground page
-router.get('/campgrounds/:id/edit', (req, res) => {
-    const campID = req.params.id;
-    Campground.findById(campID, (err, campground) => {
-        if (!err) {
+router.get('/campgrounds/:id/edit', authMiddleware.checkCampgroundOwnership, (req, res) => {
+        const campID = req.params.id;
+        Campground.findById(campID, (err, campground) => {
             res.render(`${__dirname}/../../html/campgrounds/edit.ejs`, {campground: campground});
-        } else {
-            throw new Error(err);
-        }
     });
 });
 
 // PUT - UPDATE CAMPGROUND | - Update campground with new info
-router.put('/campgrounds/:id', (req, res) => {
+router.put('/campgrounds/:id', authMiddleware.checkCampgroundOwnership, (req, res) => {
     const campID = req.params.id,
           campContent = req.body.campground; // Includes name, image and text content of campground
     // Find & Update campground
@@ -87,11 +83,10 @@ router.put('/campgrounds/:id', (req, res) => {
             throw new Error(err);
         }
     });
-    // Redirect
 });
 
 // DELETE - DELETE CAMPGROUND | - Deletes campground from database
-router.delete('/campgrounds/:id', (req, res) => {
+router.delete('/campgrounds/:id', authMiddleware.checkCampgroundOwnership, (req, res) => {
     const campID = req.params.id;
     Campground.findByIdAndRemove(campID, (err, campgrounds) => {
         if (!err) {
@@ -99,6 +94,7 @@ router.delete('/campgrounds/:id', (req, res) => {
         } else {    
             throw new Error(err);
         }
+        // Delete associated comments 
         Comment.deleteMany({ _id: {$in: campgrounds.comments}}, (err) => {
             if (err) {
                 throw new Error(err);

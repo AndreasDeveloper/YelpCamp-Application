@@ -1,5 +1,6 @@
 // - Importing Other Mandatory Files - \\
-const Campground = require('../models/Campgrounds');
+const Campground = require('../models/Campgrounds'),
+      Comment = require('../models/Comments');
 
 // isLoggedIn Middleware | - Checks if user is logged in \\
 const isLoggedIn = (req, res, next) => {
@@ -30,9 +31,32 @@ const checkCampgroundOwnership = (req, res, next) => {
         res.redirect('back');
     }
 };
+
+// checkCampgroundOwnership Middleware | - Check if user owns rights to edit/delete campground
+const checkCommentOwnership = (req, res, next) => {
+    // Check if user is logged in
+    if (req.isAuthenticated()) {
+        const commentID = req.params.comment_id;
+        Comment.findById(commentID, (err, foundComment) => {
+            if (!err) {
+                // Check if user owns the campground
+                if (foundComment.author.id.equals(req.user._id)) {
+                    next();
+                } else {
+                    res.redirect('back');
+                }
+            } else {
+                throw new Error(err);
+            }
+        });
+    } else {
+        res.redirect('back');
+    }
+};
  
 // Exporting middleware
 module.exports = {
     isLoggedIn,
-    checkCampgroundOwnership
+    checkCampgroundOwnership,
+    checkCommentOwnership
 };

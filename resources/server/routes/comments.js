@@ -32,7 +32,7 @@ router.post('/campgrounds/:id/comments', authMiddleware.isLoggedIn, (req, res) =
             Comment.create(commentsBody, (err, comment) => {
                 if (!err) {
                     // Add username and ID to comment
-                    comment.author._id = req.user._id;
+                    comment.author.id = req.user._id;
                     comment.author.username = req.user.username;
                     // Save comment
                     comment.save();
@@ -50,7 +50,7 @@ router.post('/campgrounds/:id/comments', authMiddleware.isLoggedIn, (req, res) =
 });
 
 // GET - EDIT COMMENT FORM | - Displays form for editing/updating comments
-router.get('/campgrounds/:id/comments/:comment_id/edit', (req, res) => {
+router.get('/campgrounds/:id/comments/:comment_id/edit', authMiddleware.checkCommentOwnership, (req, res) => {
     const campID = req.params.id,
           commentID = req.params.comment_id;
     Comment.findById(commentID, (err, foundComment) => {
@@ -63,7 +63,7 @@ router.get('/campgrounds/:id/comments/:comment_id/edit', (req, res) => {
 });
 
 // PUT - UPDATING COMMENT | - Updates the comment with new content
-router.put('/campgrounds/:id/comments/:comment_id', (req, res) => {
+router.put('/campgrounds/:id/comments/:comment_id', authMiddleware.checkCommentOwnership, (req, res) => {
     const commentID = req.params.comment_id,
           commentData = req.body.comment,
           campID = req.params.id;
@@ -77,7 +77,7 @@ router.put('/campgrounds/:id/comments/:comment_id', (req, res) => {
 });
 
 // DELETE - DELETE COMMENT | - Delete the comment
-router.delete('/campgrounds/:id/comments/:comment_id', (req, res) => {
+router.delete('/campgrounds/:id/comments/:comment_id', authMiddleware.checkCommentOwnership, (req, res) => {
     const commentID = req.params.comment_id;
     Comment.findByIdAndRemove(commentID, (err) => {
         if (!err) {

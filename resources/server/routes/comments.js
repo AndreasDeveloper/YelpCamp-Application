@@ -1,7 +1,6 @@
 // Importing Express Router
 const express = require('express'),
       router = express.Router({ mergeParams: true }); // Merge params from campground and comments together so there is access to id and similar elements
-      
 // Importing other files
 const Campground = require('../models/Campgrounds'),
       Comment = require('../models/Comments');
@@ -49,6 +48,34 @@ router.post('/campgrounds/:id/comments', authMiddleware.isLoggedIn, (req, res) =
         }
     });
 });
+
+// GET - EDIT COMMENT FORM | - Displays form for editing/updating comments
+router.get('/campgrounds/:id/comments/:comment_id/edit', (req, res) => {
+    const campID = req.params.id,
+          commentID = req.params.comment_id;
+    Comment.findById(commentID, (err, foundComment) => {
+        if (!err) {
+            res.render(`${__dirname}/../../html/comments/edit-comment.ejs`, { campground_id: campID, comment: foundComment });
+        } else {
+            throw new Error(err);
+        }
+    });
+});
+
+// PUT - UPDATING COMMENT | - Updates the comment with new content
+router.put('/campgrounds/:id/comments/:comment_id', (req, res) => {
+    const commentID = req.params.comment_id,
+          commentData = req.body.comment,
+          campID = req.params.id;
+    Comment.findByIdAndUpdate(commentID, commentData, (err, updatedComment) => {
+        if (!err) {
+            res.redirect(`/campgrounds/${campID}`)
+        } else {
+            throw new Error(err);
+        }
+    });
+});
+
 
 // Exporting Campgrounds Router
 module.exports = router;

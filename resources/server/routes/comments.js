@@ -76,6 +76,17 @@ router.put('/campgrounds/:id/comments/:comment_id', (req, res) => {
     });
 });
 
+// DELETE - DELETE COMMENT | - Delete the comment
+router.delete('/campgrounds/:id/comments/:comment_id', (req, res) => {
+    const commentID = req.params.comment_id;
+    Comment.findByIdAndRemove(commentID, (err) => {
+        if (!err) {
+            res.redirect('back'); // if specifiying the show page, do it this way ==> /campgrounds/${req.params.id} = id of the campground
+        } else {
+            throw new Error(err);
+        }
+    });
+});
 
 // Exporting Campgrounds Router
 module.exports = router;

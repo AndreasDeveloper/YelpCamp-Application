@@ -7,7 +7,7 @@ const isLoggedIn = (req, res, next) => {
     if (req.isAuthenticated()) {
         return next();
     }
-    req.flash('error', 'Login First');
+    req.flash('error', 'Log In First in order to do that');
     res.redirect('/login');
 };
 
@@ -22,13 +22,16 @@ const checkCampgroundOwnership = (req, res, next) => {
                 if (campground.author.id.equals(req.user._id)) {
                     next();
                 } else {
+                    req.flash('error', 'Error Occured');
                     res.redirect('back');
                 }
             } else {
+                req.flash('error', 'No permission to do that');
                 throw new Error(err);
             }
         });
     } else {
+        req.flash('error', 'Log In First in order to do that');
         res.redirect('back');
     }
 };
@@ -44,13 +47,16 @@ const checkCommentOwnership = (req, res, next) => {
                 if (foundComment.author.id.equals(req.user._id)) {
                     next();
                 } else {
+                    req.flash('error', 'Error Occured');
                     res.redirect('back');
                 }
             } else {
+                req.flash('error', 'No permission to do that');
                 throw new Error(err);
             }
         });
     } else {
+        req.flash('error', 'Log In First in order to do that');
         res.redirect('back');
     }
 };

@@ -38,8 +38,10 @@ router.post('/campgrounds/:id/comments', authMiddleware.isLoggedIn, (req, res) =
                     comment.save();
                     campground.comments.push(comment);
                     campground.save();
+                    req.flash('success', 'Comment Created');
                     res.redirect(`/campgrounds/${campground._id}`);
                 } else {
+                    req.flash('error', 'Error Occured');
                     throw new Error(err);
                 }
             });
@@ -81,6 +83,7 @@ router.delete('/campgrounds/:id/comments/:comment_id', authMiddleware.checkComme
     const commentID = req.params.comment_id;
     Comment.findByIdAndRemove(commentID, (err) => {
         if (!err) {
+            req.flash('success', 'Comment Deleted');
             res.redirect('back'); // if specifiying the show page, do it this way ==> /campgrounds/${req.params.id} = id of the campground
         } else {
             throw new Error(err);

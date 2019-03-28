@@ -21,10 +21,12 @@ router.post('/register', (req, res) => {
     User.register(new User({ username: username}), password, (err, user) => { // user => newly created user
         if (!err) {
             passport.authenticate('local')(req, res, () => {
+                req.flash('success', `Successfully Signed Up as ${user.username}`);
                 res.redirect('/campgrounds');
             });      
         } else {
-            throw new Error(err);
+            req.flash('error', err.message);
+            res.redirect('/register');
         }
     });
 });

@@ -67,7 +67,12 @@ router.get('/campgrounds/:id', (req, res) => {
 router.get('/campgrounds/:id/edit', authMiddleware.checkCampgroundOwnership, (req, res) => {
         const campID = req.params.id;
         Campground.findById(campID, (err, campground) => {
-            res.render(`${__dirname}/../../html/campgrounds/edit.ejs`, {campground: campground});
+            if (!err) {
+                res.render(`${__dirname}/../../html/campgrounds/edit.ejs`, {campground: campground});
+            } else {
+                req.flash('error', 'Campground doesn\'t exist');
+                throw new Error(err);
+            }
     });
 });
 

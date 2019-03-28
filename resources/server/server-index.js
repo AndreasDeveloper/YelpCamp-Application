@@ -5,7 +5,8 @@ const express = require('express'),
       mongoose = require('mongoose'),
       passport = require('passport'),
       LocalStrategy = require('passport-local'),
-      methodOverride = require('method-override');
+      methodOverride = require('method-override'),
+      flash = require('connect-flash');
 // - Importing Other Project Files | MVC - \\
 const Campground = require('./models/Campgrounds'),
       Comment = require('./models/Comments'),
@@ -35,6 +36,8 @@ mongoose.set('useNewUrlParser', true);
 app.use(express.static(`${__dirname}/../`));
 // - Method Override - \\
 app.use(methodOverride('_method'));
+// - Connect Flash - \\
+app.use(flash());
 
 // ==================== \\
 //  - PASSPORT SETUP - 
@@ -55,6 +58,9 @@ passport.deserializeUser(User.deserializeUser());
 // Displays user on every single page (if logged in)
 app.use((req, res, next) => {
     res.locals.currentUser = req.user;
+    // Flash Messages Setup | Error & Success
+    res.locals.error = req.flash('error');
+    res.locals.success = req.flash('success');
     next();
 });
 

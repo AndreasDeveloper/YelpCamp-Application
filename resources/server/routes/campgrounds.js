@@ -33,11 +33,12 @@ router.get('/campgrounds/new', authMiddleware.isLoggedIn, (req, res) => {
 router.post('/campgrounds', authMiddleware.isLoggedIn, (req, res) => {
     // Author object filled with users ID and username (In order to display username that created campground)
     const author = { id: req.user._id, username: req.user.username };
-    // accessing name, image, desc from form name attributes (Campground data)
+    // accessing name, image, price, desc from form name attributes (Campground data)
     const name = req.body.name, 
           image = req.body.image,
           description = req.body.description,
-          newCampground = {name: name, image: image, description: description, author: author}; // storing extracted form data into the object
+          price = req.body.price,
+          newCampground = {name: name, image: image, price: price, description: description, author: author}; // storing extracted form data into the object
     // Create a new campground, save it to DB
     Campground.create(newCampground, (err, newlyCreatedCamp) => { // newlyCreatedCamp is a object of newly created data
         if (!err) {

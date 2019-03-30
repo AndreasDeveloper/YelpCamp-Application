@@ -5,7 +5,8 @@ const express = require('express'),
 const authMiddleware = require('../middlewares/authMiddleware');
 // Importing other files 
 const Campground = require('../models/Campgrounds'),
-      Comment = require('../models/Comments');
+      Comment = require('../models/Comments'),
+      escapeRegex = require('../../js/utilities/regex-escape');
 
 // ==================== \\
 // - CAMPGROUNDS ROUTE - 
@@ -13,15 +14,32 @@ const Campground = require('../models/Campgrounds'),
 
 // GET - ALL CAMPGROUNDS - INDEX | - Camp Grounds - \\
 router.get('/campgrounds', (req, res) => {
-    const userBody = req.user;
-    // Get campgrounds from DB
-    Campground.find({}, (err, allCampgrounds) => {
-        if (!err) {
-            res.render(`${__dirname}/../../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds, currentUser: userBody}); // campgrounds param in ejs : allCampgrounds as DB data
-        } else {
-            throw new Error(err);
-        }
-    });
+    // Declaring Variables
+    let noMatch = '';
+    if (req.query.search) {
+        const userBody = req.user;
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        Campground.find({name: regex}, (err, foundCampground) => {
+            if (!err) {
+                if (foundCampground.length < 1) {
+                    noMatch = 'No results found.';
+                }
+                res.render(`${__dirname}/../../html/campgrounds/index.ejs`, {campgrounds: foundCampground, currentUser: userBody, noMatch: noMatch});
+            } else {
+                throw new Error(err);
+            }
+        });
+    } else {
+        const userBody = req.user;
+        // Get campgrounds from DB
+        Campground.find({}, (err, allCampgrounds) => {
+            if (!err) {
+                res.render(`${__dirname}/../../html/campgrounds/index.ejs`, {campgrounds: allCampgrounds, currentUser: userBody, noMatch: noMatch}); // campgrounds param in ejs : allCampgrounds as DB data
+            } else {
+                throw new Error(err);
+            }
+        });
+    }
 });
 
 // GET - NEW CAMPGROUND FORM | - Adding new Camp grounds page with form - \\

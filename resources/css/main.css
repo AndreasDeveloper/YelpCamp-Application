@@ -17,3 +17,23 @@ body {
     flex-direction: row;
 }
 .button-actions a { margin-right: 10px; }
+
+/* Search Container | Campgrounds INDEX */
+.search-container {
+    display: flex;
+}
+.search-container a {
+    margin-right: 1rem;
+}
+/* Search Bar */
+.search-form {
+    display: flex;
+}
+.search-bar {
+    width: 15rem;
+    height: 100%;
+}
+.search-bar::placeholder { padding: 0 .2rem; }
+.search-button {
+    margin-left: .5rem;
+}
